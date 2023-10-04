@@ -3,6 +3,7 @@ import 'package:flutter_conn_database/model/Transactions.dart';
 import 'package:flutter_conn_database/providers/Transaction_provider.dart';
 import 'package:provider/provider.dart';
 
+
 class FormCourse extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
@@ -11,6 +12,8 @@ class FormCourse extends StatelessWidget {
   final nameController = TextEditingController();
 
   final teacherController = TextEditingController();
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +43,12 @@ class FormCourse extends StatelessWidget {
                         ),
                       ),
                       keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "กรุณากรอกรหัสรายวิชา";
+                        }
+                        return null; // เพิ่ม ; ที่นี่
+                      },
                     ),
                     SizedBox(
                       height: 10,
@@ -53,6 +62,12 @@ class FormCourse extends StatelessWidget {
                                   BorderRadius.all(Radius.circular(5))),
                           prefixIcon: Icon(Icons.menu_book_sharp)),
                       keyboardType: TextInputType.name,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "กรุณากรอกรายวิชา";
+                        }
+                        return null; // เพิ่ม ; ที่นี่
+                      },
                     ),
                     SizedBox(
                       height: 10,
@@ -68,7 +83,7 @@ class FormCourse extends StatelessWidget {
                       keyboardType: TextInputType.text,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "กรุณากรอกข้อมูล";
+                          return "กรุณากรอกชื่ออาจารย์";
                         }
                         return null; // เพิ่ม ; ที่นี่
                       },

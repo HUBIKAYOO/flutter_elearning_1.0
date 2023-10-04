@@ -47,25 +47,6 @@ class _FormDetailState extends State<FormDetail> {
     });
   }
 
-  // String? _filePath;
-  // // ฟังก์ชันสำหรับเปิดตัวเลือกไฟล์
-  // Future<void> _pickFile() async {
-  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //     type: FileType.custom,
-  //     allowedExtensions: ['pdf', 'doc', 'docx'],
-  //   );
-
-  //   if (result != null) {
-  //     setState(() {
-  //       _filePath = result.files.single.name;
-  //     });
-  //   }
-  // }
-  // void _clearFile(){
-  //   setState(() {
-  //     _filePath = null;
-  //   });
-  // }
 
   List<String> documents = [];
   List<String> selectedDocumentNames = [];
@@ -78,7 +59,7 @@ class _FormDetailState extends State<FormDetail> {
       setState(() {
         documents.addAll(result.files.map((file) => file.path!).toList());
         selectedDocumentNames
-            .addAll(result.files.map((file) => file.name!).toList());
+            .addAll(result.files.map((file) => file.name).toList());
       });
     }
   }

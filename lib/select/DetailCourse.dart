@@ -4,7 +4,6 @@ import 'package:flutter_conn_database/model/Transactions.dart';
 import 'package:flutter_conn_database/providers/Transaction_provider.dart';
 import 'package:flutter_conn_database/insert/form_detail.dart';
 import 'package:open_file/open_file.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -70,15 +69,6 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
       body: Consumer<TransactionProvider>(
         builder: (context, provider, widget) {
-          // var count = provider.transactions.length;
-          // if (count <= 0) {
-          //   return Center(
-          //     child: Text(
-          //       "ไม่พบข้อมูล",
-          //       style: TextStyle(fontSize: 20),
-          //     ),
-          //   );
-          // }else{
           List<Transactions> filteredTransactions = provider.transactions
               .where((transaction) => transaction.number == x)
               .toList();
@@ -97,76 +87,100 @@ class _DetailScreenState extends State<DetailScreen> {
                   Transactions data = filteredTransactions[index];
                   return Container(
                     decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Color.fromRGBO(255, 75, 135, 1), width: 2),
-                        borderRadius: BorderRadius.circular(7)),
+                      boxShadow: [
+                        BoxShadow(
+                            offset: Offset(0, 5),
+                            color: Color.fromARGB(255, 255, 189, 211),
+                            spreadRadius: 2,
+                            blurRadius: 10)
+                      ],
+                      borderRadius: BorderRadius.circular(7),
+                      // border: Border.all(
+                      //     color: Color.fromRGBO(255, 75, 135, 1), width: 2),
+                    ),
                     margin: EdgeInsets.only(
-                        top: 20, left: 20, right: 20, bottom: 10),
+                      top: 15,
+                      left: 20,
+                      right: 20,
+                    ),
                     width: 400,
                     height: null,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(7),
+                                  topRight: Radius.circular(7)),
+                              color: Colors.white),
+
                           width: 400,
-                          color: Color.fromRGBO(255, 75, 135, 1),
+                          // color: Color.fromRGBO(255, 75, 135, 1),
                           padding: EdgeInsets.only(
                               top: 10, left: 10, right: 40, bottom: 10),
                           height: null,
                           child: Text(
                             data.dname,
                             style: TextStyle(
-                                fontSize: 20,
-                                color: Color.fromARGB(221, 67, 67, 67),
+                                fontSize: 30,
+                                color: Colors.pink,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
                         Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(7),
+                                  bottomRight: Radius.circular(7)),
+                              color: Colors.white),
                           padding: EdgeInsets.only(
                               left: 10, right: 40, bottom: 10, top: 10),
                           height: null,
-                          width: null,
+                          width: 400,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              data.imageFile != null
-                                  ? GestureDetector(
-                                      onTap: () {
-                                        _viewImage(
-                                            context, data.imageFile.path);
-                                      },
-                                      child: Container(
-                                        height: null,
-                                        width: 208,
-                                        padding: EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: Color.fromARGB(
-                                                234, 204, 204, 204), // สีขอบๆ
-                                            width: 2.0, // ความหนาขอบๆ
+                              if (data.imageFile != null)
+                                data.imageFile != null
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          _viewImage(
+                                              context, data.imageFile.path);
+                                        },
+                                        child: Container(
+                                          height: null,
+                                          width: 208,
+                                          padding: EdgeInsets.all(2),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Color.fromARGB(
+                                                  221, 123, 123, 123),
+                                              width: 2.0, // ความหนาขอบๆ
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                              5), // เพิ่มขอบโค้งของรูปภาพ
-                                          child: Image.file(
-                                            data.imageFile,
-                                            width: 208,
-                                            height: null,
-                                            fit: BoxFit
-                                                .cover, // ปรับขนาดรูปภาพให้พอดีกับ Container
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                                5), // เพิ่มขอบโค้งของรูปภาพ
+                                            child: Image.file(
+                                              data.imageFile,
+                                              width: 208,
+                                              height: null,
+                                              fit: BoxFit
+                                                  .cover, // ปรับขนาดรูปภาพให้พอดีกับ Container
+                                            ),
                                           ),
                                         ),
+                                      )
+                                    : SizedBox(
+                                        height: 30,
                                       ),
-                                    )
-                                  : SizedBox(
-                                      height: 30,
-                                    ),
-                              SizedBox(
-                                height: 10,
-                              ),
+                              if (data.imageFile != null)
+                                SizedBox(
+                                  height: 10,
+                                ),
                               if (data.documents.isNotEmpty)
                                 Container(
                                   padding: EdgeInsets.only(left: 10),
@@ -197,18 +211,19 @@ class _DetailScreenState extends State<DetailScreen> {
                                           },
                                           child: Row(
                                             children: [
-                                              Icon(Icons
-                                                  .file_present_outlined,color: Colors.white), // Add your desired icon here
+                                              Icon(Icons.file_present_outlined,
+                                                  color: Colors
+                                                      .white), // Add your desired icon here
                                               SizedBox(
                                                   width:
                                                       10), // Adjust the spacing between icon and text
                                               Text(
                                                 displayFileName,
                                                 style: TextStyle(
-                                                  fontSize: 16,
-                                                  decoration:
-                                                      TextDecoration.none,color: Colors.white
-                                                ),
+                                                    fontSize: 16,
+                                                    decoration:
+                                                        TextDecoration.none,
+                                                    color: Colors.white),
                                               ),
                                             ],
                                           ),
@@ -217,9 +232,10 @@ class _DetailScreenState extends State<DetailScreen> {
                                     ),
                                   ),
                                 ),
-                              SizedBox(
-                                height: 10,
-                              ),
+                              if (data.documents.isNotEmpty)
+                                SizedBox(
+                                  height: 10,
+                                ),
                               Text(
                                 data.detail,
                                 style: TextStyle(fontSize: 15),

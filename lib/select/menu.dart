@@ -14,7 +14,7 @@ class _menuState extends State<menu> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 5,
+        length: 2,
         child: Scaffold(
           body: TabBarView(children: [  MyHomePage(),developer()]),
           backgroundColor: Colors.pink,
