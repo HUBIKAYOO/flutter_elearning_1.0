@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_conn_database/model/Transactions.dart';
 import 'package:flutter_conn_database/providers/Transaction_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -66,6 +67,22 @@ class _FormDetailState extends State<FormDetail> {
   //   });
   // }
 
+  List<String> documents = [];
+  List<String> selectedDocumentNames = [];
+
+  void _pickDocument() async {
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
+
+    if (result != null) {
+      setState(() {
+        documents.addAll(result.files.map((file) => file.path!).toList());
+        selectedDocumentNames
+            .addAll(result.files.map((file) => file.name!).toList());
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +128,7 @@ class _FormDetailState extends State<FormDetail> {
                       children: [
                         Container(
                           height: null,
-                          width: 110,
+                          width: 207,
                           padding: EdgeInsets.all(2),
                           decoration: BoxDecoration(
                             border: Border.all(
@@ -133,7 +150,7 @@ class _FormDetailState extends State<FormDetail> {
                                             5), // เพิ่มขอบโค้งของรูปภาพ
                                         child: Image.file(
                                           _imageFile!,
-                                          width: 100,
+                                          width: 207,
                                           height: null,
                                           fit: BoxFit
                                               .cover, // ปรับขนาดรูปภาพให้พอดีกับ Container
@@ -143,8 +160,8 @@ class _FormDetailState extends State<FormDetail> {
                                         borderRadius: BorderRadius.circular(
                                             5), // เพิ่มขอบโค้งของ Container
                                         child: Container(
-                                          width: 110,
-                                          height: 110,
+                                          width: 207,
+                                          height: 207,
                                           color: Color.fromARGB(
                                               255, 255, 193, 213),
                                           child: Center(
@@ -177,48 +194,50 @@ class _FormDetailState extends State<FormDetail> {
                             ),
                           ),
                         ),
-                        // Stack(children: [
-                        //   _filePath != null
-                        //       ? ElevatedButton(
-                        //           style: ElevatedButton.styleFrom(
-                        //               backgroundColor: const Color.fromARGB(255, 255, 75, 135)),
-                        //           onPressed: _pickFile,
-                        //           child: Text(
-                        //             _filePath != null
-                        //                 ? _filePath!.length <= 15
-                        //                     ? _filePath!
-                        //                     : _filePath!.substring(0, 15) +
-                        //                         "..."
-                        //                 : '',
-                        //           ),
-                        //         )
-                        //       : ElevatedButton.icon(
-                        //           style: ElevatedButton.styleFrom(
-                        //               backgroundColor: const Color.fromARGB(
-                        //                   255, 255, 75, 135)),
-                        //           onPressed: _pickFile,
-                        //           icon: Icon(Icons
-                        //               .file_upload_outlined), // ไอคอนที่คุณต้องการเพิ่ม
-                        //           label: Text('เพิ่มไฟล์'), // ข้อความบนปุ่ม
-                        //         ),
-                        //         if(_filePath != null)
-                        //         Positioned(
-                        //           top: 5, // ระยะขอบบนของรูปภาพ
-                        //           right: 1, // ระยะขอบซ้ายของรูปภาพ
-                        //           child: InkWell(
-                        //             onTap: _clearFile,
-                        //             child: Container(
-                        //               padding: EdgeInsets.all(3),
-                        //               child: Icon(
-                        //                 Icons.close,
-                        //                 color: Colors.white,
-                        //                 size: 20,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //         ),
-
-                        // ]),
+                        IntrinsicWidth(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 255, 75, 135),
+                            ),
+                            onPressed: _pickDocument,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Icon(
+                                  Icons
+                                      .upload, // You can change the icon as needed
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  selectedDocumentNames.isNotEmpty
+                                      ? (selectedDocumentNames.last.length <= 15
+                                          ? selectedDocumentNames.last
+                                          : selectedDocumentNames.last
+                                                  .substring(0, 15) +
+                                              "...")
+                                      : 'เพิ่มไฟล์',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                                if (selectedDocumentNames.isNotEmpty)
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedDocumentNames.clear();
+                                        documents.clear();
+                                      });
+                                    },
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
                         TextFormField(
                           controller: detailController,
                           decoration:
@@ -244,13 +263,12 @@ class _FormDetailState extends State<FormDetail> {
                   var dname = nameController.text;
                   var detail = detailController.text;
 
-
                   Transactions statement = Transactions(
                     number: x,
                     dname: dname,
                     detail: detail,
+                    documents: documents,
                     imageFile: _imageFile,
-
                     name: "",
                     teacher: "",
                   );

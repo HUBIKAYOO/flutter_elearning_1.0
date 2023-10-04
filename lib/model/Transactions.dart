@@ -5,6 +5,7 @@ class Transactions{
 
    String dname;
   final imageFile;
+  List<String> documents;
   String detail;
 
   
@@ -16,6 +17,7 @@ class Transactions{
 
       required this.dname,
       required this.imageFile,
+      required this.documents,
       required this.detail,
     }
   );

@@ -1,13 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_conn_database/model/Transactions.dart';
 import 'package:flutter_conn_database/providers/Transaction_provider.dart';
 import 'package:flutter_conn_database/insert/form_detail.dart';
+import 'package:open_file/open_file.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
 class DetailScreen extends StatefulWidget {
-  final String number,name;
-  DetailScreen({required this.number,required this.name});
-  
+  final String number, name;
+  DetailScreen({required this.number, required this.name});
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
@@ -15,7 +17,7 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   TextEditingController _descriptionController = TextEditingController();
-  String x = "",name="";
+  String x = "", name = "";
   void initState() {
     super.initState();
     // ดึงค่า number และกำหนดให้กับตัวแปร x
@@ -25,10 +27,39 @@ class _DetailScreenState extends State<DetailScreen> {
     // _descriptionController.text = widget.transaction.description;
   }
 
+  Future<void> _viewPDF(BuildContext context, String filePath) async {
+    final result = await OpenFile.open(filePath);
+    if (result.type != ResultType.done) {
+      // Handle the error, if any
+      // For example, you can show an error message
+      print('Error opening PDF: ${result.message}');
+    }
+  }
+
   @override
   void dispose() {
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _viewImage(BuildContext context, String filePath) async {
+    try {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: InteractiveViewer(
+              boundaryMargin: EdgeInsets.all(20.0), // Margin for boundary
+              minScale: 0.1, // Minimum scale value
+              maxScale: 4.0, // Maximum scale value
+              child: Image.file(File(filePath)),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      print('Error viewing image: $e');
+    }
   }
 
   @override
@@ -99,34 +130,96 @@ class _DetailScreenState extends State<DetailScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               data.imageFile != null
-                              ? Container(
-                                height: null,
-                                width: 110,
-                                padding: EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Color.fromARGB(
-                                        234, 204, 204, 204), // สีขอบๆ
-                                    width: 2.0, // ความหนาขอบๆ
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        _viewImage(
+                                            context, data.imageFile.path);
+                                      },
+                                      child: Container(
+                                        height: null,
+                                        width: 208,
+                                        padding: EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Color.fromARGB(
+                                                234, 204, 204, 204), // สีขอบๆ
+                                            width: 2.0, // ความหนาขอบๆ
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                              5), // เพิ่มขอบโค้งของรูปภาพ
+                                          child: Image.file(
+                                            data.imageFile,
+                                            width: 208,
+                                            height: null,
+                                            fit: BoxFit
+                                                .cover, // ปรับขนาดรูปภาพให้พอดีกับ Container
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : SizedBox(
+                                      height: 30,
+                                    ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              if (data.documents.isNotEmpty)
+                                Container(
+                                  padding: EdgeInsets.only(left: 10),
+                                  width: 208,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Color.fromRGBO(
+                                        255, 75, 135, 1), // Border radius
                                   ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                      5), // เพิ่มขอบโค้งของรูปภาพ
-                                  child: Image.file(
-                                    data.imageFile,
-                                    width: 100,
-                                    height: null,
-                                    fit: BoxFit
-                                        .cover, // ปรับขนาดรูปภาพให้พอดีกับ Container
+                                  child: Center(
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: data.documents.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        final file = data.documents[index];
+                                        final fileName = file.split('/').last;
+                                        final displayFileName =
+                                            fileName.length <= 17
+                                                ? fileName
+                                                : fileName.substring(0, 17) +
+                                                    "...";
+
+                                        return GestureDetector(
+                                          onTap: () {
+                                            _viewPDF(context, file);
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons
+                                                  .file_present_outlined,color: Colors.white), // Add your desired icon here
+                                              SizedBox(
+                                                  width:
+                                                      10), // Adjust the spacing between icon and text
+                                              Text(
+                                                displayFileName,
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  decoration:
+                                                      TextDecoration.none,color: Colors.white
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
-                              )
-                              :SizedBox(width: 11,),
-                              
-                              Text("ไฟล์"),
-                              SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
                               Text(
                                 data.detail,
                                 style: TextStyle(fontSize: 15),

@@ -28,6 +28,7 @@ class TransactionDB {
     var keyID = store.add(db, {
       "name": statement.name,
       "number": statement.number,
+      "file": statement.documents,
  
     });
     db.close();
