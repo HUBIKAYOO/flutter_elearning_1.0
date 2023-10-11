@@ -26,6 +26,7 @@ class _FormDetailState extends State<FormDetail> {
 
   final nameController = TextEditingController();
   final detailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   File? _imageFile; // เพิ่มตัวแปร _imageFile
   final ImagePicker _imagePicker = ImagePicker(); // เพิ่มตัวแปร _imagePicker
@@ -46,7 +47,6 @@ class _FormDetailState extends State<FormDetail> {
       _imageFile = null;
     });
   }
-
 
   List<String> documents = [];
   List<String> selectedDocumentNames = [];
@@ -70,6 +70,7 @@ class _FormDetailState extends State<FormDetail> {
       appBar: AppBar(title: Text("เพิ่มข้อมูล")),
       body: SingleChildScrollView(
           child: Form(
+        key: _formKey,
         child: Column(
           children: [
             Container(
@@ -98,6 +99,12 @@ class _FormDetailState extends State<FormDetail> {
                         ),
                       ),
                       style: TextStyle(fontSize: 20),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "กรุณากรอกหัวข้อ";
+                        }
+                        return null; // เพิ่ม ; ที่นี่
+                      },
                     ),
                   ),
                   Container(
@@ -175,34 +182,73 @@ class _FormDetailState extends State<FormDetail> {
                             ),
                           ),
                         ),
-                        IntrinsicWidth(
-                          child: ElevatedButton(
+                        SizedBox(
+                          height: 10,
+                        ),
+                        if (selectedDocumentNames.isEmpty)
+                          ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   const Color.fromARGB(255, 255, 75, 135),
                             ),
                             onPressed: _pickDocument,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Icon(
-                                  Icons
-                                      .upload, // You can change the icon as needed
-                                  color: Colors.white,
+                            child: Container(
+                              width: 175,
+                              height: 45,
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .center, // Center-align contents horizontally
+                                  children: [
+                                    Icon(
+                                      Icons
+                                          .upload, // You can change the icon as needed
+                                      color: Colors.white,
+                                    ),
+                                    Text(
+                                      "เพิ่มไฟล์",
+                                      style: TextStyle(fontSize: 17,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    
+                                  ],
                                 ),
-                                SizedBox(width: 5),
-                                Text(
-                                  selectedDocumentNames.isNotEmpty
-                                      ? (selectedDocumentNames.last.length <= 15
-                                          ? selectedDocumentNames.last
-                                          : selectedDocumentNames.last
-                                                  .substring(0, 15) +
-                                              "...")
-                                      : 'เพิ่มไฟล์',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                                if (selectedDocumentNames.isNotEmpty)
+                              ),
+                            ),
+                          ),
+                        if (selectedDocumentNames.isNotEmpty)
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 255, 75, 135),
+                            ),
+                            onPressed: _pickDocument,
+                            child: Container(
+                              width: 175,
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 150,
+                                      child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        for (String fileName
+                                            in selectedDocumentNames)
+                                          Text(
+                                            fileName.length <= 15
+                                                ? fileName
+                                                : fileName.substring(0, 16) +
+                                                    "...",
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  
                                   InkWell(
                                     onTap: () {
                                       setState(() {
@@ -215,10 +261,10 @@ class _FormDetailState extends State<FormDetail> {
                                       color: Colors.white,
                                     ),
                                   ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
                         TextFormField(
                           controller: detailController,
                           decoration:
@@ -241,25 +287,24 @@ class _FormDetailState extends State<FormDetail> {
                     backgroundColor: Color.fromRGBO(255, 75, 135, 1),
                     minimumSize: Size(300, 50)),
                 onPressed: () {
-                  var dname = nameController.text;
-                  var detail = detailController.text;
+                  if (_formKey.currentState!.validate()) {
+                    var dname = nameController.text;
+                    var detail = detailController.text;
 
-                  Transactions statement = Transactions(
-                    number: x,
-                    dname: dname,
-                    detail: detail,
-                    documents: documents,
-                    imageFile: _imageFile,
-                    name: "",
-                    teacher: "",
-                  );
-                  var provider =
-                      Provider.of<TransactionProvider>(context, listen: false);
-                  provider.addTransaction(statement);
-                  Navigator.pop(context);
-                  print(x);
-                  print(detail);
-                  print(_imageFile);
+                    Transactions statement = Transactions(
+                      number: x,
+                      dname: dname,
+                      detail: detail,
+                      documents: documents,
+                      imageFile: _imageFile,
+                      name: "no",
+                      teacher: "",
+                    );
+                    var provider = Provider.of<TransactionProvider>(context,
+                        listen: false);
+                    provider.addTransaction(statement);
+                    Navigator.pop(context);
+                  }
                 },
                 child: Text(
                   'บันทึก',
@@ -273,3 +318,64 @@ class _FormDetailState extends State<FormDetail> {
     );
   }
 }
+
+
+
+
+
+// if (selectedDocumentNames.isNotEmpty)
+//                         ElevatedButton(
+//                           style: ElevatedButton.styleFrom(
+//                             backgroundColor:
+//                                 const Color.fromARGB(255, 255, 75, 135),
+//                           ),
+//                           onPressed: _pickDocument,
+//                           child: Container(
+//                             width: 175,
+//                             padding: EdgeInsets.only(top: 10, bottom: 10),
+//                             child: Row(
+//                               children: [
+//                                 if (selectedDocumentNames.isNotEmpty)
+//                                   Column(
+//                                     crossAxisAlignment: CrossAxisAlignment.start,
+//                                     children: [
+//                                       for (String fileName
+//                                           in selectedDocumentNames)
+//                                         Text(
+//                                           fileName.length <= 15
+//                                               ? fileName
+//                                               : fileName.substring(0, 15) +
+//                                                   "...",
+//                                           maxLines: 1,
+//                                           overflow: TextOverflow.ellipsis,
+//                                         ),
+//                                     ],
+//                                   ),
+//                                 if (selectedDocumentNames.isNotEmpty)
+//                                   InkWell(
+//                                     onTap: () {
+//                                       setState(() {
+//                                         selectedDocumentNames.clear();
+//                                         documents.clear();
+//                                       });
+//                                     },
+//                                     child: Icon(
+//                                       Icons.delete,
+//                                       color: Colors.white,
+//                                     ),
+//                                   ),
+//                                 if (selectedDocumentNames.isEmpty)
+//                                   Icon(
+//                                     Icons
+//                                         .upload, // You can change the icon as needed
+//                                     color: Colors.white,
+//                                   ),
+//                                 if (selectedDocumentNames.isEmpty)
+//                                   Text("เพิ่มไฟล์",
+//                                       style: TextStyle(
+//                                         fontWeight: FontWeight.bold,
+//                                       ))
+//                               ],
+//                             ),
+//                           ),
+//                         ),

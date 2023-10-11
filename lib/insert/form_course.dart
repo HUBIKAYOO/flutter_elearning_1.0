@@ -66,6 +66,9 @@ class FormCourse extends StatelessWidget {
                         if (value == null || value.isEmpty) {
                           return "กรุณากรอกรายวิชา";
                         }
+                        if (value == "no") {
+                          return "กรุณากรอกชื่อรายวิชาอื่น";
+                        }
                         return null; // เพิ่ม ; ที่นี่
                       },
                     ),

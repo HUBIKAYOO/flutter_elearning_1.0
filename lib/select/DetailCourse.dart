@@ -183,9 +183,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                 ),
                               if (data.documents.isNotEmpty)
                                 Container(
-                                  padding: EdgeInsets.only(left: 10),
+                                  padding: EdgeInsets.all(10),
                                   width: 208,
-                                  height: 40,
+                                  height: null,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                     color: Color.fromRGBO(
@@ -200,9 +200,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                         final file = data.documents[index];
                                         final fileName = file.split('/').last;
                                         final displayFileName =
-                                            fileName.length <= 17
+                                            fileName.length <= 15
                                                 ? fileName
-                                                : fileName.substring(0, 17) +
+                                                : fileName.substring(0, 15) +
                                                     "...";
 
                                         return GestureDetector(
@@ -236,10 +236,11 @@ class _DetailScreenState extends State<DetailScreen> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                              Text(
-                                data.detail,
-                                style: TextStyle(fontSize: 15),
-                              )
+                              if (data.detail.isNotEmpty)
+                                Text(
+                                  data.detail,
+                                  style: TextStyle(fontSize: 15),
+                                )
                             ],
                           ),
                         )

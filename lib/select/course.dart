@@ -22,9 +22,9 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Consumer(builder: (context, TransactionProvider provider, widget) {
         List<Transactions> filteredTransactions = provider.transactions
             .where((transaction) =>
-                transaction.name != null && transaction.name.isNotEmpty)
+                transaction.name != "no")
             .toList();
-        var count = provider.transactions.length;
+        var count = filteredTransactions.length;
         if (count <= 0) {
           return Center(
             child: Text(
